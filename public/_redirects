@@ -1,0 +1,3 @@
+/* /index.html 200
+# Proxy AI over HTTPS same-origin to avoid mixed content
+/ai/*  http://213.148.21.100:9000/:splat  200

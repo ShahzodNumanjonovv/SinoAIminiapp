@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none">
+  <!-- rangni xohlagan tailwind rangiga moslab o'zgartirishingiz mumkin -->
+  <g stroke="#0EA5E9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- doira (tana) -->
+    <circle cx="9.5" cy="14.5" r="4.5"/>
+    <!-- yuqoriga o‘ngga o‘q -->
+    <path d="M13 11l6-6"/>
+    <path d="M14.5 5H19v4.5"/>
+  </g>
+</svg>
