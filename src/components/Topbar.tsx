@@ -1,6 +1,6 @@
 // src/components/Topbar.tsx
 import React from "react";
-import { useI18n } from "../i18n";
+import { getNextLang, useI18n } from "../i18n";
 
 type Props = {
   title?: string;
@@ -29,7 +29,7 @@ export default function Topbar({ title, showBack = "auto" }: Props) {
 
   // i18n hook
   const { lang, setLang, t } = useI18n();
-  const toggleLang = () => setLang(lang === "uz" ? "ru" : "uz");
+  const toggleLang = () => setLang(getNextLang(lang));
   const displayTitle = title ?? t("app_title");
 
   return (
@@ -67,7 +67,7 @@ export default function Topbar({ title, showBack = "auto" }: Props) {
             onClick={toggleLang}
             className="rounded-lg bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-200 active:bg-slate-300 transition dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
           >
-            {lang === "uz" ? "UZ" : "RU"}
+            {lang.toUpperCase()}
           </button>
         </div>
       </div>

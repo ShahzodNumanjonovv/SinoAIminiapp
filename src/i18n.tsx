@@ -1,7 +1,13 @@
 // src/i18n.tsx
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-export type Lang = "uz" | "ru";
+export type Lang = "uz" | "ru" | "en";
+export const LANGS: Lang[] = ["uz", "ru", "en"];
+export function getNextLang(current: Lang): Lang {
+  const idx = LANGS.indexOf(current);
+  const nextIdx = (idx + 1) % LANGS.length;
+  return LANGS[nextIdx] ?? "uz";
+}
 type Dict = Record<string, string>;
 type Packs = Record<Lang, Dict>;
 
@@ -351,16 +357,131 @@ const packs: Packs = {
     chat_ph: "Задайте вопрос…",
     chat_error: "Произошла ошибка",
   },
+
+  en: {
+    app_title: "SinoAI",
+
+    // Titles
+    book_title: "Book a doctor visit",
+    with_doctor: "with",
+
+    // Form
+    doctors: "Doctor",
+    patient_name: "First name",
+    last_name: "Last name (optional)",
+    phone: "Phone number",
+    date: "Date",
+    gender: "Gender",
+    male: "Male",
+    female: "Female",
+
+    // Placeholders
+    ph_firstName: "Name",
+    ph_lastName: "Last name",
+    ph_phone: "+1 555 000 0000",
+    workTimeValue: "Mon–Fri: 8:30 AM – 4:30 PM",
+
+    // Slots & actions
+    available_slots: "Available slots",
+    loading_busy: "Loading busy slots...",
+    no_slots: "No free time on this day. Pick another date.",
+    choose_time: "Select time",
+    cancel: "Cancel",
+    book_now: "Book now",
+    sending: "Sending...",
+    close: "Close",
+    save_error: "An error occurred while saving",
+    busy_error: "An error occurred while loading slots",
+    profile_rating: "Rating",
+    profile_workTime: "Work hours",
+    confirm_cancel: "Are you sure you want to cancel?",
+
+    // Toasts
+    booked_ok_title: "Booking confirmed!",
+    booked_ok_desc: "Appointment saved. An operator will contact you soon.",
+
+    // Common / cards / home
+    doctor_one: "doctor",
+    doctor_many: "doctors",
+    go_home: "Home",
+    years: "years",
+    years_plus: "years+",
+    experience: "Experience",
+    patients: "patients",
+    patients_caption: "Patients treated",
+    book_btn: "Book a doctor visit",
+    not_available_yet: "Not available yet",
+    loading: "Loading...",
+    no_bookings: "No bookings yet",
+    soon: "Coming soon",
+
+    // Profile badges / extras
+    rating: "Rating",
+    work_time: "Work hours",
+
+    // Categories
+    cardiolog: "Cardiologist",
+    dermatolog: "Dermatologist",
+    endokrinolog: "Endocrinologist",
+    gastroenterolog: "Gastroenterologist",
+    ginekolog: "Gynecologist",
+    nefrolog: "Nephrologist",
+    nevrolog: "Neurologist",
+    dietolog: "Dietitian",
+    ortoped: "Orthopedist",
+    osteopat: "Osteopath",
+    pediatr: "Pediatrician",
+    proktolog: "Proctologist",
+    terapevt: "Therapist",
+    trikolog: "Trichologist",
+    urolog: "Urologist",
+
+    // Tabs
+    tab_doctors: "Doctors",
+    tab_search: "Search",
+    tab_chat: "AI Chat",
+    tab_profile: "Profile",
+
+    // Profile/Menu
+    profile_mini_app: "Mini App Profile",
+    profile_default_user: "Telegram user",
+    menu_my_bookings: "My bookings",
+    menu_language: "Language",
+    menu_open_app: "Open app",
+    menu_privacy: "Privacy",
+    menu_share_app: "Share app",
+
+    // Search
+    search_title: "Search",
+    search_name: "First, last name",
+    search_spec: "Specialty",
+    search_exp: "Experience",
+    search_clinic: "Clinic",
+    search_ph_name: "Doctor name...",
+    search_ph_spec: "Choose a specialty",
+    search_ph_clinic: "Clinic name...",
+    search_no_results: "No matching results",
+    search_no_results_title: "Nothing found",
+    search_no_results_hint: "Try another search term",
+
+    // Chat
+    chat_history: "History",
+    chat_new: "New chat",
+    chat_ph: "Ask a question...",
+    chat_error: "An error occurred",
+  },
 };
 
 function detectInitial(): Lang {
   if (typeof window === "undefined") return "uz";
   try {
     const saved = localStorage.getItem("lang") as Lang | null;
-    if (saved === "uz" || saved === "ru") return saved;
+    if (saved === "uz" || saved === "ru" || saved === "en") return saved;
   } catch {}
   const nav = (typeof navigator !== "undefined" ? navigator.language : "uz").toLowerCase();
-  return nav.startsWith("ru") ? "ru" : "uz";
+  if (nav.startsWith("ru")) return "ru";
+  if (nav.startsWith("en")) return "en";
+  return "uz";
 }
 
 type Ctx = { lang: Lang; setLang: (l: Lang) => void; t: (k: string) => string };

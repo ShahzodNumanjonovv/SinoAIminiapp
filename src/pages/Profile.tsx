@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { cancelRequestLocal, loadRequests, LocalRequest } from "../lib/requests";
 import { getTelegramUser, getSavedTelegramUser, shareMiniApp } from "../lib/telegram";
-import { useI18n } from "../i18n";
+import { getNextLang, useI18n } from "../i18n";
 
 export default function Profile() {
   const { lang, setLang, t } = useI18n();
@@ -49,7 +49,7 @@ export default function Profile() {
           icon="/icons/language.svg"
           title={t("menu.language")}
           right={<span className="text-slate-500 text-sm">{lang.toUpperCase()}</span>}
-          onClick={() => setLang(lang === "uz" ? "ru" : "uz")}
+          onClick={() => setLang(getNextLang(lang))}
         />
         <MenuItem
           icon="/icons/globe.svg"
