@@ -50,7 +50,7 @@ export default function DoctorProfile() {
             <img
               src={doctor.avatar}
               alt=""
-              className="h-56 w-full object-cover"
+              className="h-80 w-full object-cover object-top"
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src = AVATAR_FALLBACK;
               }}
