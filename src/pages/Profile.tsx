@@ -1,12 +1,20 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { cancelRequestLocal, loadRequests, LocalRequest } from "../lib/requests";
-import { getTelegramUser, getSavedTelegramUser, shareMiniApp } from "../lib/telegram";
+import {
+  getTelegramUser,
+  getSavedTelegramUser,
+  shareMiniApp,
+  getThemePreference,
+  toggleTheme,
+  type ThemeMode,
+} from "../lib/telegram";
 import { getNextLang, useI18n } from "../i18n";
 
 export default function Profile() {
   const { lang, setLang, t } = useI18n();
   const [reqs, setReqs] = useState<LocalRequest[]>([]);
   const [userName, setUserName] = useState<string>("");
+  const [theme, setTheme] = useState<ThemeMode>(() => getThemePreference());
 
   useEffect(() => {
     setReqs(loadRequests());
@@ -50,6 +58,12 @@ export default function Profile() {
           title={t("menu.language")}
           right={<span className="text-slate-500 text-sm">{lang.toUpperCase()}</span>}
           onClick={() => setLang(getNextLang(lang))}
+        />
+        <MenuItem
+          icon={<span className="text-lg">{theme === "dark" ? "🌙" : "☀️"}</span>}
+          title={t("menu.theme")}
+          right={<span className="text-slate-500 text-sm">{t(theme === "dark" ? "theme.dark" : "theme.light")}</span>}
+          onClick={() => setTheme(toggleTheme())}
         />
         <MenuItem
           icon="/icons/globe.svg"
@@ -115,7 +129,17 @@ export default function Profile() {
   );
 }
 
-function MenuItem({ icon, title, right, onClick }: { icon: string; title: string; right?: ReactNode; onClick?: () => void }) {
+function MenuItem({
+  icon,
+  title,
+  right,
+  onClick,
+}: {
+  icon: string | ReactNode;
+  title: string;
+  right?: ReactNode;
+  onClick?: () => void;
+}) {
   return (
     <button
       onClick={onClick}
@@ -123,7 +147,7 @@ function MenuItem({ icon, title, right, onClick }: { icon: string; title: string
     >
       <div className="flex items-center gap-3">
         <div className="grid size-9 place-items-center rounded-xl bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-          <img src={icon} alt="" className="h-5 w-5" />
+          {typeof icon === "string" ? <img src={icon} alt="" className="h-5 w-5" /> : icon}
         </div>
         <span className="font-medium">{title}</span>
       </div>

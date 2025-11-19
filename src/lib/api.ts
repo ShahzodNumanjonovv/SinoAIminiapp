@@ -197,6 +197,10 @@ const list = (j.doctors as any[]).map((d) => ({
   return list;
 }
 
+function safeStringify(payload: any) {
+  return JSON.stringify(payload, (_, value) => (typeof value === "bigint" ? value.toString() : value));
+}
+
 /* =========================================================
  * Busy slots: ma’lum doktor va kun uchun band bo‘lgan slotlar
  * CRM endpoint: GET /api/doctors/:id/availability?date=YYYY-MM-DD
@@ -249,7 +253,7 @@ export async function bookAppointment<T = any>(payload: BookPayload): Promise<T>
       "Content-Type": "application/json",
       ...(clinic ? { "x-clinic-code": clinic } : {}),
     },
-    body: JSON.stringify(payload),
+    body: safeStringify(payload),
   });
 
   const j = await safeJson(res);
@@ -282,7 +286,7 @@ export async function holdAppointment(payload: HoldPayload): Promise<{ holdId: s
       "Content-Type": "application/json",
       ...(clinic ? { "x-clinic-code": clinic } : {}),
     },
-    body: JSON.stringify(payload),
+    body: safeStringify(payload),
   });
 
   const j = await safeJson(res);
@@ -313,7 +317,7 @@ export async function bookAppointmentWithHold<T = any>(payload: BookWithHoldPayl
       "Content-Type": "application/json",
       ...(clinic ? { "x-clinic-code": clinic } : {}),
     },
-    body: JSON.stringify(payload),
+    body: safeStringify(payload),
   });
 
   const j = await safeJson(res);
@@ -347,7 +351,7 @@ export async function fetchMyRequests(tgUserId: number): Promise<Appointment[]> 
 export async function cancelAppointment(id: string): Promise<{ ok: true }> {
   return request<{ ok: true }>(`/api/miniapp/cancel`, {
     method: "POST",
-    body: JSON.stringify({ id }),
+    body: safeStringify({ id }),
   } as any);
 }
 

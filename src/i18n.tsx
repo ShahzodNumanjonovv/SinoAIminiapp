@@ -100,9 +100,12 @@ const ALIASES: Record<string, string> = {
   "profile.defaultUser": "profile_default_user",
   "menu.myBookings": "menu_my_bookings",
   "menu.language": "menu_language",
+  "menu.theme": "menu_theme",
   "menu.openApp": "menu_open_app",
   "menu.privacy": "menu_privacy",
   "menu.shareApp": "menu_share_app",
+  "theme.light": "theme_light",
+  "theme.dark": "theme_dark",
   // search
   "search.title": "search_title",
   "search.name": "search_name",
@@ -222,9 +225,12 @@ const packs: Packs = {
     profile_default_user: "Telegram foydalanuvchi",
     menu_my_bookings: "Bronlarim",
     menu_language: "Til",
+    menu_theme: "Mavzu",
     menu_open_app: "Ochiladigan havola",
     menu_privacy: "Maxfiylik",
     menu_share_app: "Ulashish",
+    theme_light: "Yorug'",
+    theme_dark: "Tungi",
 
     // Search
     search_title: "Qidiruv",
@@ -334,9 +340,12 @@ const packs: Packs = {
     profile_default_user: "Пользователь Telegram",
     menu_my_bookings: "Мои записи",
     menu_language: "Язык",
+    menu_theme: "Тема",
     menu_open_app: "Открыть приложение",
     menu_privacy: "Конфиденциальность",
     menu_share_app: "Поделиться",
+    theme_light: "Светлая",
+    theme_dark: "Тёмная",
 
     // Search
     search_title: "Поиск",
@@ -447,9 +456,12 @@ const packs: Packs = {
     profile_default_user: "Telegram user",
     menu_my_bookings: "My bookings",
     menu_language: "Language",
+    menu_theme: "Theme",
     menu_open_app: "Open app",
     menu_privacy: "Privacy",
     menu_share_app: "Share app",
+    theme_light: "Light",
+    theme_dark: "Dark",
 
     // Search
     search_title: "Search",

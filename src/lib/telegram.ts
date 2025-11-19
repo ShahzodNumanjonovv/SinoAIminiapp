@@ -1,5 +1,62 @@
 import WebApp from "@twa-dev/sdk";
 
+export type ThemeMode = "light" | "dark";
+const THEME_OVERRIDE_KEY = "theme.override";
+
+function getThemeOverride(): ThemeMode | null {
+  try {
+    const raw = localStorage.getItem(THEME_OVERRIDE_KEY);
+    if (raw === "dark" || raw === "light") return raw;
+  } catch {}
+  return null;
+}
+
+function persistThemeOverride(mode: ThemeMode | null) {
+  try {
+    if (mode) localStorage.setItem(THEME_OVERRIDE_KEY, mode);
+    else localStorage.removeItem(THEME_OVERRIDE_KEY);
+  } catch {}
+}
+
+function applyTheme(mode: ThemeMode) {
+  try {
+    if (mode === "dark") {
+      WebApp.setHeaderColor("secondary_bg_color");
+      WebApp.setBackgroundColor("bg_color");
+    } else {
+      WebApp.setHeaderColor("bg_color");
+      WebApp.setBackgroundColor("bg_color");
+    }
+  } catch {}
+  if (typeof document !== "undefined") {
+    const root = document.documentElement;
+    if (mode === "dark") root.classList.add("dark");
+    else root.classList.remove("dark");
+  }
+  try { localStorage.setItem("theme", mode); } catch {}
+}
+
+export function getThemePreference(): ThemeMode {
+  const manual = getThemeOverride();
+  if (manual) return manual;
+  try {
+    const stored = localStorage.getItem("theme");
+    if (stored === "dark" || stored === "light") return stored;
+  } catch {}
+  return "light";
+}
+
+export function setThemePreference(mode: ThemeMode, opts?: { manual?: boolean }) {
+  if (opts?.manual) persistThemeOverride(mode);
+  applyTheme(mode);
+}
+
+export function toggleTheme(): ThemeMode {
+  const next = getThemePreference() === "dark" ? "light" : "dark";
+  setThemePreference(next, { manual: true });
+  return next;
+}
+
 // init & theme
 export function initTelegram() {
   try {
@@ -12,22 +69,14 @@ export function initTelegram() {
 }
 
 function applyTelegramTheme() {
+  const manual = getThemeOverride();
+  if (manual) {
+    applyTheme(manual);
+    return;
+  }
   try {
     const scheme = (WebApp as any)?.colorScheme as "light" | "dark" | undefined;
-    if (scheme === "dark") {
-      // Tun: Telegram ichki qora fonlariga mos
-      WebApp.setHeaderColor("secondary_bg_color");
-      WebApp.setBackgroundColor("bg_color");
-    } else {
-      // Kunduz: oq sarlavha
-      WebApp.setHeaderColor("bg_color");
-      WebApp.setBackgroundColor("bg_color");
-    }
-    // App temasi ham TG mavzusiga mos: default — oq (light)
-    const root = document.documentElement;
-    if (scheme === "dark") root.classList.add("dark");
-    else root.classList.remove("dark");
-    try { localStorage.setItem("theme", scheme === "dark" ? "dark" : "light"); } catch {}
+    applyTheme(scheme === "dark" ? "dark" : "light");
   } catch {}
 }
 
