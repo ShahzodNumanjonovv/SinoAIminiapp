@@ -25,8 +25,8 @@ export default function BookModal({
   const [phone, setPhone] = useState("");
   const [gender, setGender] = useState<Gender>();
 
-  const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), []);
-  const [date, setDate] = useState<string>(todayStr);
+  const allowedDate = "2025-11-28"; // only booking date
+  const [date, setDate] = useState<string>(allowedDate);
 
   // Select string value bilan ishlaydi (label bilan)
   const [slots, setSlots] = useState<Slot[]>([]);
@@ -190,7 +190,9 @@ export default function BookModal({
             className="w-full card px-4 py-3"
             type="date"
             value={date}
-            onChange={(e) => setDate(e.target.value)}
+            min={allowedDate}
+            max={allowedDate}
+            onChange={(e) => setDate(e.target.value === allowedDate ? allowedDate : allowedDate)}
           />
         </label>
 
