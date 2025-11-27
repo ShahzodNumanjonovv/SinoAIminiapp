@@ -214,7 +214,7 @@ const packs: Packs = {
     terapevt: "Terapevt",
     trikolog: "Trikolog",
     urolog: "Urolog",
-    nevropatolog: "Nevropatalog",
+    nevropatolog: "Nevropatolog",
     
     // Tabs
     tab_doctors: "Shifokorlar",
