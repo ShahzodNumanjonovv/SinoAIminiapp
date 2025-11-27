@@ -24,6 +24,7 @@ const CATS = [
   { id: "therap",   spec: "Terapevt",        titleKey: "terapevt",        icon: "terapevt",        subtitle: " " },
   { id: "tricho",   spec: "Trikolog",        titleKey: "trikolog",        icon: "trikolog",        subtitle: " " },
   { id: "uro",      spec: "Urolog",          titleKey: "urolog",          icon: "urolog",          subtitle: " " },
+  { id: "nevrop",   spec: "Nevropatolog",    titleKey: "nevropatolog",    icon: "nevropatolog",    subtitle: " " },
 ];
 
 export default function Home() {

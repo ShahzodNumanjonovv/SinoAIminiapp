@@ -88,6 +88,7 @@ const ALIASES: Record<string, string> = {
   "cat.proktolog": "proktolog",
   "cat.trikolog": "trikolog",
   "cat.urolog": "urolog",
+  "cat.nevropatolog": "nevropatolog",
   
   // tabs
   "tab.doctors": "tab_doctors",
@@ -213,6 +214,7 @@ const packs: Packs = {
     terapevt: "Terapevt",
     trikolog: "Trikolog",
     urolog: "Urolog",
+    nevropatolog: "Nevropatalog",
     
     // Tabs
     tab_doctors: "Shifokorlar",
@@ -328,6 +330,7 @@ const packs: Packs = {
     terapevt: "Терапевт",
     trikolog: "Трихолог",
     urolog: "Уролог",
+    nevropatolog: "Невропатолог",
     
     // Tabs
     tab_doctors: "Врачи",
@@ -444,6 +447,7 @@ const packs: Packs = {
     terapevt: "Therapist",
     trikolog: "Trichologist",
     urolog: "Urologist",
+    nevropatolog: "Neuropathologist",
 
     // Tabs
     tab_doctors: "Doctors",
