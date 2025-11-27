@@ -1,9 +1,8 @@
 // src/pages/BookModal.tsx
-import { useEffect, useMemo, useState } from "react";
-import { Doctor } from "../types";
-import { slots } from "../data";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Doctor, Slot } from "../types";
 import Select from "../components/Select";
-import { getBusySlots, holdAppointment, bookAppointmentWithHold } from "../lib/api";
+import { getFreeSlots, holdAppointment, bookAppointmentWithHold } from "../lib/api";
 import SuccessModal from "../components/SuccessModal";
 import { useI18n } from "../i18n"; // ⬅️ i18n hook (t, lang)
 import { addRequest } from "../lib/requests";
@@ -30,62 +29,57 @@ export default function BookModal({
   const [date, setDate] = useState<string>(todayStr);
 
   // Select string value bilan ishlaydi (label bilan)
-  const [selectedSlotLabel, setSelectedSlotLabel] = useState<string>(slots[0].label);
+  const [slots, setSlots] = useState<Slot[]>([]);
+  const [selectedSlotLabel, setSelectedSlotLabel] = useState<string>("");
+  const [slotsLoading, setSlotsLoading] = useState(false);
+  const [slotsError, setSlotsError] = useState("");
+  const selectedSlotRef = useRef("");
+
+  useEffect(() => {
+    selectedSlotRef.current = selectedSlotLabel;
+  }, [selectedSlotLabel]);
+
   const currentSlot = useMemo(
     () => slots.find((s) => s.label === selectedSlotLabel),
-    [selectedSlotLabel]
+    [slots, selectedSlotLabel]
   );
 
-  // ---- availability state
-  const [busy, setBusy] = useState<Set<string>>(new Set());
-  const [loadingBusy, setLoadingBusy] = useState<boolean>(false);
-  const [busyError, setBusyError] = useState<string>("");
-
-  // Sana yoki doktor o‘zgarganda band slotlarni olib kelish
   useEffect(() => {
     let stop = false;
-
+    setSlotsLoading(true);
+    setSlotsError("");
     (async () => {
-      setLoadingBusy(true);
-      setBusyError("");
       try {
-        const arr = await getBusySlots(doctor.id, date); // ['10:00', '10:30', ...]
-        if (!stop) setBusy(new Set(arr));
+        const list = await getFreeSlots(doctor.id, date);
+        if (stop) return;
+        setSlots(list);
+        const prevSelected = selectedSlotRef.current;
+        if (list.length === 0) {
+          setSelectedSlotLabel("");
+        } else {
+          const stillThere = list.some((s) => s.label === prevSelected);
+          setSelectedSlotLabel(stillThere ? prevSelected : list[0].label);
+        }
       } catch (e) {
-        console.error("getBusySlots failed:", e);
+        console.error("getFreeSlots failed:", e);
         if (!stop) {
-          setBusy(new Set());
-          setBusyError(t("busy.error")); // ⬅️ i18n
+          setSlots([]);
+          setSelectedSlotLabel("");
+          setSlotsError(t("busy.error"));
         }
       } finally {
-        if (!stop) setLoadingBusy(false);
+        if (!stop) setSlotsLoading(false);
       }
     })();
-
     return () => {
       stop = true;
     };
   }, [doctor.id, date, t]);
 
-  // Faqat bo‘sh slotlarni ko‘rsatamiz (busy dagilar umuman chiqmaydi)
-  const freeSlots = useMemo(
-    () => slots.filter((s) => !busy.has(s.from)),
-    [busy]
-  );
-
-  // Select opsiyalari
   const options = useMemo(
-    () => freeSlots.map((s) => ({ label: s.label, value: s.label })),
-    [freeSlots]
+    () => slots.map((s) => ({ label: s.label, value: s.label })),
+    [slots]
   );
-
-  // Tanlangan label free listdan chiqib qolsa — birinchisini tanlaymiz
-  useEffect(() => {
-    if (freeSlots.length === 0) return;
-    const exists = freeSlots.some((s) => s.label === selectedSlotLabel);
-    if (!exists) setSelectedSlotLabel(freeSlots[0].label);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [freeSlots]);
 
   // ---- submit
   const [submitting, setSubmitting] = useState(false);
@@ -93,10 +87,11 @@ export default function BookModal({
 
   const submitDisabled =
     submitting ||
+    slotsLoading ||
     !firstName.trim() ||
     !phone.trim() ||
     !currentSlot ||
-    freeSlots.length === 0;
+    slots.length === 0;
 
   const onSubmit = async () => {
     if (!currentSlot) return;
@@ -139,10 +134,11 @@ export default function BookModal({
     } catch (e: any) {
       console.error("hold/book failed:", e);
       alert(e?.message || t("form.saveError"));
-      // Refresh busy slots in case state changed
+      // Refresh slots in case state changed
       try {
-        const arr = await getBusySlots(doctor.id, date);
-        setBusy(new Set(arr));
+        const updated = await getFreeSlots(doctor.id, date);
+        setSlots(updated);
+        if (updated.length === 0) setSelectedSlotLabel("");
       } catch {}
     } finally {
       setSubmitting(false);
@@ -219,25 +215,25 @@ export default function BookModal({
         <label className="block">
           <div className="muted mb-2">{t("slots.title")}</div>
 
-          {loadingBusy ? (
+          {slotsLoading ? (
             <div className="card px-4 py-3 text-sm text-slate-500">
-              {t("busy.loading")}
+              {t("slots.loading")}
             </div>
-          ) : freeSlots.length === 0 ? (
+          ) : slots.length === 0 ? (
             <div className="card px-4 py-3 text-center text-sm text-slate-500">
-              {t("busy.empty")}
+              {t("slots.empty")}
             </div>
           ) : (
             <Select
               options={options}
-              value={selectedSlotLabel}
+              value={selectedSlotLabel || null}
               onChange={(v) => setSelectedSlotLabel(v)}
               placeholder={t("ph.chooseTime")}
               className="w-full"
             />
           )}
 
-          {busyError && <div className="mt-2 text-xs text-amber-600">{busyError}</div>}
+          {slotsError && <div className="mt-2 text-xs text-amber-600">{slotsError}</div>}
         </label>
 
         <div className="flex gap-3">

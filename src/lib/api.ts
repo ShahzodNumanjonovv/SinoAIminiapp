@@ -20,7 +20,7 @@ function fallbackAvatar() {
 }
 
 // ---- Tiplar
-import type { Doctor as UIDoctor } from "../types";
+import type { Doctor as UIDoctor, Slot } from "../types";
 import { getClinic } from "./clinic";
 
 function makeUrl(path: string) {
@@ -202,16 +202,32 @@ function safeStringify(payload: any) {
 }
 
 /* =========================================================
- * Busy slots: ma’lum doktor va kun uchun band bo‘lgan slotlar
- * CRM endpoint: GET /api/doctors/:id/availability?date=YYYY-MM-DD
+ * Available slots: ma’lum doktor va kun uchun bo‘sh vaqtlar
+ * CRM endpoint: GET /api/doctors/:id/availability?mode=free
  * =======================================================*/
-export async function getBusySlots(
+function addMinutesToTime(time: string, minutes: number) {
+  const [h, m] = time.split(":").map((v) => parseInt(v, 10));
+  if (Number.isNaN(h) || Number.isNaN(m)) return time;
+  const total = h * 60 + m + minutes;
+  const normalized = ((total % (24 * 60)) + 24 * 60) % (24 * 60); // keep within day
+  const hh = Math.floor(normalized / 60)
+    .toString()
+    .padStart(2, "0");
+  const mm = (normalized % 60).toString().padStart(2, "0");
+  return `${hh}:${mm}`;
+}
+
+export async function getFreeSlots(
   doctorId: string,
-  date: string
-): Promise<string[]> {
+  date: string,
+  opts?: { step?: number }
+): Promise<Slot[]> {
   const clinic = getClinic();
+  const step = opts?.step ?? 20;
   const url = makeUrl(`/api/doctors/${doctorId}/availability`);
   url.searchParams.set("date", date);
+  url.searchParams.set("mode", "free");
+  url.searchParams.set("step", String(step));
   if (clinic) url.searchParams.set("clinic", clinic);
   const res = await fetch(url.toString(), {
     credentials: "omit",
@@ -222,8 +238,12 @@ export async function getBusySlots(
   if (!res.ok || j?.ok === false) {
     throw new Error(j?.message || "Failed to load availability");
   }
-
-  return (j.busySlots ?? []) as string[];
+  const freeSlots = Array.isArray(j?.freeSlots) ? (j.freeSlots as string[]) : [];
+  const duration = Number(j?.step) || step;
+  return freeSlots.map((from) => {
+    const to = addMinutesToTime(from, duration);
+    return { from, to, label: `${from} - ${to}` };
+  });
 }
 
 /* =========================================================
